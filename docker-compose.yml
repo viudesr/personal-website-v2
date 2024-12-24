@@ -3,3 +3,26 @@ services:
     build: .
     ports:
       - 8000:8000
+    environment:
+      - DB_NAME=${DB_NAME}
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_HOST=${DB_HOST}
+      - DB_PORT=${DB_PORT}
+    depends_on:
+      postgresql:
+        condition: service_healthy
+  postgresql:
+    image: postgres:17.2-bookworm
+    ports:
+      - 5432:5432
+    environment:
+      - POSTGRES_DB=${DB_NAME}
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready", "-d", "viudesr"]
+      interval: 30s
+      timeout: 60s
+      retries: 5
+      start_period: 80s
